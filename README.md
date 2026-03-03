@@ -36,6 +36,28 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Ionic + Capacitor (BDD)
+
+The project now includes Ionic and Capacitor with `@capacitor-community/sqlite` for client records persistence on native platforms.
+
+Useful commands:
+
+```bash
+npx cap sync android
+npx cap open android
+```
+
+For web development (`ng serve`), client persistence uses a local PHP API connected to MySQL:
+
+- `api/clients.php` (GET/POST clients)
+- `api/db.php` (MySQL connection settings)
+
+Before testing the save flow from the Angular form:
+
+1. Import `guide_phpmyadmin.sql` in phpMyAdmin
+2. Verify credentials in `api/db.php` (host/user/password/database)
+3. Ensure Apache + MySQL are running in WAMP
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Kitadi Angular</string>
+    <string name="title_activity_main">Kitadi Angular</string>
+    <string name="package_name">fr.kitadi.energies</string>
+    <string name="custom_url_scheme">fr.kitadi.energies</string>
+</resources>
