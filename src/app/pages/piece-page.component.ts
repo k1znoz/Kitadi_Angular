@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ClientDatabaseService } from '../shared/services/client-database.service';
 import { LettersOnlyDirective } from '../shared/directives/letters-only.directive';
 import { NumbersOnlyDirective } from '../shared/directives/numbers-only.directive';
 import { ProjectDataService } from '../shared/services/project-data.service';
@@ -88,6 +89,7 @@ import { ProjectDataService } from '../shared/services/project-data.service';
 export class PiecePageComponent {
   private route = inject(ActivatedRoute);
   private readonly projectData = inject(ProjectDataService);
+  private readonly clientDatabase = inject(ClientDatabaseService);
 
   pieceNumber = 1;
   nom = '';
@@ -107,12 +109,16 @@ export class PiecePageComponent {
     return this.projectData.getMaisonData().temperatureBase;
   }
 
+  get gCoefficient(): number {
+    return this.projectData.getMaisonData().g;
+  }
+
   get deltaT(): number {
     return (Number(this.temperatureConfort) || 0) - this.temperatureBase;
   }
 
   get puissanceP(): number {
-    return (Number(this.longueur) || 0) * (Number(this.largeur) || 0) * (Number(this.hauteur) || 0) * this.deltaT;
+    return this.gCoefficient * (Number(this.longueur) || 0) * (Number(this.largeur) || 0) * (Number(this.hauteur) || 0) * this.deltaT;
   }
 
   get previousLabel(): string {
@@ -131,7 +137,7 @@ export class PiecePageComponent {
     return `/piece/${this.pieceNumber + 1}`;
   }
 
-  savePieceData(): void {
+  async savePieceData(): Promise<void> {
     this.projectData.upsertPiece({
       id: this.pieceNumber,
       nom: this.nom,
@@ -140,14 +146,32 @@ export class PiecePageComponent {
       hauteur: Number(this.hauteur) || 0,
       temperatureConfort: Number(this.temperatureConfort) || 0,
     });
+
+    await this.syncDossierToDatabase();
+  }
+
+  private async syncDossierToDatabase(): Promise<void> {
+    const clientRef = this.projectData.getActiveClientRef();
+
+    if (!clientRef) {
+      return;
+    }
+
+    try {
+      await this.clientDatabase.exportDossier(clientRef, this.projectData.getMaisonData(), this.projectData.getPieces());
+    } catch {
+      return;
+    }
   }
 
   private loadPieceData(): void {
     const piece = this.projectData.getPiece(this.pieceNumber);
+    const defaultHeight = this.projectData.getDefaultPieceHeight();
+
     this.nom = piece?.nom ?? '';
     this.longueur = piece?.longueur ? String(piece.longueur) : '';
     this.largeur = piece?.largeur ? String(piece.largeur) : '';
-    this.hauteur = piece?.hauteur ? String(piece.hauteur) : '';
+    this.hauteur = piece?.hauteur ? String(piece.hauteur) : defaultHeight ? String(defaultHeight) : '';
     this.temperatureConfort = piece?.temperatureConfort ? String(piece.temperatureConfort) : '';
   }
 }

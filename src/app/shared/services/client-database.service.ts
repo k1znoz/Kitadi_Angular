@@ -70,14 +70,14 @@ export class ClientDatabaseService {
     this.initialized = true;
   }
 
-  async getClients(): Promise<ClientRecord[]> {
+  async getClients(searchTerm = ''): Promise<ClientRecord[]> {
     await this.initialize();
 
     if (Capacitor.isNativePlatform()) {
-      return this.getNativeClients();
+      return this.getNativeClients(searchTerm);
     }
 
-    return this.getRemoteClients();
+    return this.getRemoteClients(searchTerm);
   }
 
   async saveClient(client: NewClientRecord): Promise<void> {
@@ -265,14 +265,21 @@ export class ClientDatabaseService {
     await this.ensureNativeColumns();
   }
 
-  private async getNativeClients(): Promise<ClientRecord[]> {
+  private async getNativeClients(searchTerm = ''): Promise<ClientRecord[]> {
     if (!this.db) {
       return [];
     }
 
-    const result = await this.db.query(
-      'SELECT id, nom, prenom, numero, rue, ref, date, ville, cp, tel, mail FROM clients ORDER BY id DESC;',
-    );
+    const trimmedSearch = searchTerm.trim();
+    const hasSearch = trimmedSearch !== '';
+    const likeSearch = `%${trimmedSearch}%`;
+    const sql = hasSearch
+      ? 'SELECT id, nom, prenom, numero, rue, ref, date, ville, cp, tel, mail FROM clients WHERE ref LIKE ? OR nom LIKE ? OR prenom LIKE ? OR ville LIKE ? OR cp LIKE ? ORDER BY id DESC;'
+      : 'SELECT id, nom, prenom, numero, rue, ref, date, ville, cp, tel, mail FROM clients ORDER BY id DESC;';
+
+    const result = hasSearch
+      ? await this.db.query(sql, [likeSearch, likeSearch, likeSearch, likeSearch, likeSearch])
+      : await this.db.query(sql);
 
     const rows = result.values ?? [];
 
@@ -313,8 +320,11 @@ export class ClientDatabaseService {
     );
   }
 
-  private async getRemoteClients(): Promise<ClientRecord[]> {
-    const response = await fetch(this.apiUrl, {
+  private async getRemoteClients(searchTerm = ''): Promise<ClientRecord[]> {
+    const trimmedSearch = searchTerm.trim();
+    const url = trimmedSearch ? `${this.apiUrl}?search=${encodeURIComponent(trimmedSearch)}` : this.apiUrl;
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         Accept: 'application/json',

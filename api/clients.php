@@ -61,6 +61,7 @@ try {
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $ref = trim((string) ($_GET['ref'] ?? ''));
+        $search = trim((string) ($_GET['search'] ?? ''));
 
         if ($ref !== '') {
             $query = $pdo->prepare('SELECT id, nom, prenom, numero, rue, ref, date_dossier, ville, cp, tel, mail FROM clients WHERE ref = :ref LIMIT 1');
@@ -68,6 +69,25 @@ try {
             $query->execute();
             $row = $query->fetch();
             $rows = $row ? [$row] : [];
+        } elseif ($search !== '') {
+            $like = '%' . $search . '%';
+            $query = $pdo->prepare(
+                'SELECT id, nom, prenom, numero, rue, ref, date_dossier, ville, cp, tel, mail
+                 FROM clients
+                 WHERE ref LIKE :search_ref
+                    OR nom LIKE :search_nom
+                    OR prenom LIKE :search_prenom
+                    OR ville LIKE :search_ville
+                    OR cp LIKE :search_cp
+                 ORDER BY id DESC'
+            );
+            $query->bindValue(':search_ref', $like);
+            $query->bindValue(':search_nom', $like);
+            $query->bindValue(':search_prenom', $like);
+            $query->bindValue(':search_ville', $like);
+            $query->bindValue(':search_cp', $like);
+            $query->execute();
+            $rows = $query->fetchAll();
         } else {
             $query = $pdo->query('SELECT id, nom, prenom, numero, rue, ref, date_dossier, ville, cp, tel, mail FROM clients ORDER BY id DESC');
             $rows = $query->fetchAll();

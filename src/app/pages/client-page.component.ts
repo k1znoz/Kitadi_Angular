@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LettersOnlyDirective } from '../shared/directives/letters-only.directive';
 import { NumbersOnlyDirective } from '../shared/directives/numbers-only.directive';
 import { ClientDatabaseService, ClientRecord } from '../shared/services/client-database.service';
+import { ProjectDataService } from '../shared/services/project-data.service';
 
 @Component({
   selector: 'app-client-page',
@@ -84,6 +85,7 @@ import { ClientDatabaseService, ClientRecord } from '../shared/services/client-d
 export class ClientPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly clientDatabase = inject(ClientDatabaseService);
+  private readonly projectData = inject(ProjectDataService);
 
   clientDate = '';
   firstName = '';
@@ -158,6 +160,7 @@ export class ClientPageComponent implements OnInit {
 
       this.editingRef = this.clientReference;
       this.selectedClientRef = this.clientReference;
+      this.projectData.setActiveClientRef(this.clientReference);
       await this.refreshExistingClients();
       this.statusMessage.set('Dossier client enregistré.');
     } catch {
@@ -181,6 +184,7 @@ export class ClientPageComponent implements OnInit {
     }
 
     this.populateFormFromClient(selected);
+    this.projectData.setActiveClientRef(selected.ref);
     this.statusMessage.set('Dossier client chargé.');
   }
 
@@ -203,6 +207,10 @@ export class ClientPageComponent implements OnInit {
 
       if (this.editingRef === ref) {
         this.resetForm();
+      }
+
+      if (this.projectData.getActiveClientRef() === ref) {
+        this.projectData.setActiveClientRef('');
       }
 
       this.selectedClientRef = '';
@@ -310,5 +318,6 @@ export class ClientPageComponent implements OnInit {
     this.email = '';
     this.editingRef = '';
     this.selectedClientRef = '';
+    this.projectData.setActiveClientRef('');
   }
 }

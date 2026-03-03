@@ -1,15 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ClientRecord, ClientDatabaseService } from '../shared/services/client-database.service';
 
 @Component({
   selector: 'app-bdd-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <section class="screen">
       <h1 class="title">Fichier Clients<br />Kitadi Energies</h1>
+
+      <div class="search-row">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          name="searchTerm"
+          placeholder="Rechercher un dossier (réf, nom, prénom, ville, CP)"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
 
       @if (errorMessage()) {
         <p class="error-message">{{ errorMessage() }}</p>
@@ -106,6 +118,15 @@ import { ClientRecord, ClientDatabaseService } from '../shared/services/client-d
       flex-wrap: wrap;
     }
 
+    .search-row {
+      width: 100%;
+      margin: 8px 0 12px;
+    }
+
+    .search-row input {
+      width: 100%;
+    }
+
     .action-btn {
       text-align: center;
     }
@@ -122,10 +143,13 @@ import { ClientRecord, ClientDatabaseService } from '../shared/services/client-d
     }
   `,
 })
-export class BddPageComponent implements OnInit {
+export class BddPageComponent implements OnInit, OnDestroy {
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly clientDatabase = inject(ClientDatabaseService);
+  private routeQuerySub?: Subscription;
 
+  searchTerm = '';
   readonly clients = signal<ClientRecord[]>([]);
   readonly errorMessage = signal('');
   readonly statusMessage = signal('');
@@ -133,13 +157,27 @@ export class BddPageComponent implements OnInit {
   readonly isDeleting = signal(false);
 
   async ngOnInit(): Promise<void> {
+    this.routeQuerySub = this.route.queryParamMap.subscribe((params) => {
+      const querySearch = params.get('search')?.trim() ?? '';
+
+      if (querySearch !== this.searchTerm) {
+        this.searchTerm = querySearch;
+        void this.loadClients();
+      }
+    });
+
     await this.loadClients();
+  }
+
+  ngOnDestroy(): void {
+    this.routeQuerySub?.unsubscribe();
   }
 
   private async loadClients(): Promise<void> {
     try {
-      const data = await this.clientDatabase.getClients();
+      const data = await this.clientDatabase.getClients(this.searchTerm);
       this.clients.set(data);
+      this.errorMessage.set('');
 
       if (this.selectedClientRef() && !data.some((client) => client.ref === this.selectedClientRef())) {
         this.selectedClientRef.set('');
@@ -148,6 +186,10 @@ export class BddPageComponent implements OnInit {
       this.errorMessage.set('Impossible de charger les dossiers clients.');
       this.clients.set([]);
     }
+  }
+
+  async onSearchChange(): Promise<void> {
+    await this.loadClients();
   }
 
   selectClient(ref: string): void {

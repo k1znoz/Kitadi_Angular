@@ -167,6 +167,7 @@ export class RapportPageComponent implements OnInit {
       this.client.set(report.client);
       this.maisonFromReport.set({
         isolation: report.maison.isolation,
+        g: this.projectData.getMaisonData().g,
         temperatureBase: report.maison.temperatureBase,
         hauteurSousPlafond: report.maison.hauteurSousPlafond,
         nombrePieces: report.maison.nombrePieces,

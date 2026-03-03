@@ -5,7 +5,13 @@
     </div>
 
     <div class="top-actions">
-      <input class="search" type="search" placeholder="search" />
+      <input
+        class="search"
+        type="search"
+        [(ngModel)]="globalSearchTerm"
+        placeholder="Rechercher un dossier client"
+        (keydown.enter)="onGlobalSearch()"
+      />
     </div>
 
     <button
