@@ -1,0 +1,211 @@
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+	--content-max-vw: 80vw;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	background: #dcdcdc;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #121212;
+}
+
+.screen {
+	display: grid;
+	gap: 16px;
+	width: min(var(--content-max-vw), 100%);
+	margin-inline: auto;
+}
+
+.title {
+	margin: 14px 0 8px;
+	text-align: center;
+	font-size: 48px;
+	line-height: 1.1;
+}
+
+.subtitle {
+	margin: -10px 0 10px;
+	text-align: center;
+	color: #9f2e2e;
+	font-size: 12px;
+}
+
+.meta-row {
+	display: grid;
+	gap: 12px;
+
+	label {
+		display: grid;
+		gap: 4px;
+		font-size: 14px;
+	}
+}
+
+.form-grid {
+	display: grid;
+	gap: 12px;
+
+	label {
+		display: grid;
+		gap: 4px;
+		font-size: 14px;
+	}
+
+	input {
+		width: 100%;
+		min-height: 32px;
+		border: 2px solid #222;
+		background: #fff;
+		padding: 4px 8px;
+	}
+}
+
+input:disabled,
+.locked-input {
+	background: #d9d9d9;
+	color: #555;
+	border-color: #6d6d6d;
+	cursor: not-allowed;
+	opacity: 1;
+}
+
+.compact {
+	gap: 8px;
+
+	input {
+		min-height: 28px;
+	}
+}
+
+.stack-actions {
+	display: grid;
+	gap: 10px;
+	justify-items: center;
+}
+
+.line-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	margin-top: 8px;
+}
+
+.btn {
+	border: 2px solid #111;
+	border-radius: 8px;
+	padding: 6px 14px;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	color: #111;
+	background: #fff;
+}
+
+.btn.ok {
+	background: #8bc17f;
+}
+
+.btn.danger {
+	background: #ea3f3f;
+	color: #fff;
+}
+
+.btn.prev {
+	background: #e7a2a2;
+}
+
+.btn.next {
+	background: #a6d193;
+}
+
+.btn.clients {
+	background: #2f77db;
+	color: #fff;
+	border-color: #2458a5;
+}
+
+.result {
+	border: 2px solid #151515;
+	color: #fff;
+	text-align: center;
+	font-size: 13px;
+	font-weight: 600;
+	padding: 6px;
+}
+
+.result.red {
+	background: #dd1616;
+}
+
+.result.blue {
+	background: #1f5db8;
+}
+
+.tutorial-label {
+	text-align: center;
+	margin: 14px 0 0;
+}
+
+.tutorial-box {
+	border: 2px solid #202020;
+	background: #efefef;
+	min-height: 130px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.two-col {
+	display: grid;
+	gap: 18px;
+
+	h3 {
+		margin: 0 0 8px;
+		text-align: center;
+	}
+}
+
+.footer-space {
+	margin-top: 40vh;
+}
+
+.data-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+
+	th,
+	td {
+		border: 1px solid #1d1d1d;
+		text-align: left;
+		padding: 4px 6px;
+	}
+
+	th {
+		background: #f1f1f1;
+	}
+}
+
+.new-case-wrap {
+	text-align: center;
+	margin-top: 20px;
+}
+
+@media (min-width: 720px) {
+	.title {
+		font-size: 56px;
+	}
+
+	.two-col,
+	.meta-row {
+		grid-template-columns: 1fr 1fr;
+	}
+}

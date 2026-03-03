@@ -1,0 +1,47 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <img src="/images/logo-kitadi_energies_small.png" alt="Kitadi Energies" />
+    </div>
+
+    <div class="top-actions">
+      <input class="search" type="search" placeholder="search" />
+    </div>
+
+    <button
+      type="button"
+      class="burger"
+      [class.open]="menuOpen"
+      (click)="toggleMenu()"
+      aria-label="Ouvrir le menu"
+      [attr.aria-expanded]="menuOpen"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="menu" [class.open]="menuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()"
+        >Home</a
+      >
+      <a routerLink="/client" routerLinkActive="active" (click)="closeMenu()">Client</a>
+      <a routerLink="/maison" routerLinkActive="active" (click)="closeMenu()">Maison</a>
+      <a routerLink="/piece/1" routerLinkActive="active" (click)="closeMenu()">Pièces</a>
+    </nav>
+
+    <a class="clients-btn" routerLink="/bdd" (click)="closeMenu()">Fichier clients</a>
+  </header>
+
+  <button
+    type="button"
+    class="menu-overlay"
+    [class.open]="menuOpen"
+    (click)="closeMenu()"
+    aria-label="Fermer le menu"
+  ></button>
+
+  <main class="page-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
