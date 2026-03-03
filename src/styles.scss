@@ -194,6 +194,23 @@ input:disabled,
 	}
 }
 
+.table-link {
+	display: inline-block;
+	padding: 2px 8px;
+	border: 1px solid #1f4f9b;
+	border-radius: 6px;
+	background: rgba(47, 119, 219, 0.1);
+	text-decoration: none;
+	color: #1f4f9b;
+	font-weight: 600;
+}
+
+.table-link:hover {
+	background: #5ca83b;
+	border-color: #3f7f2a;
+	color: #fff;
+}
+
 .new-case-wrap {
 	text-align: center;
 	margin-top: 20px;

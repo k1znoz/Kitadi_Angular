@@ -1,25 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LettersOnlyDirective } from '../shared/directives/letters-only.directive';
-import { NumbersOnlyDirective } from '../shared/directives/numbers-only.directive';
+import { ProjectDataService } from '../shared/services/project-data.service';
 
 @Component({
   selector: 'app-rapport-page-two',
   standalone: true,
-  imports: [RouterLink, LettersOnlyDirective, NumbersOnlyDirective],
+  imports: [RouterLink],
   template: `
     <section class="screen">
-      <h3>Pièce : ...</h3>
+      @for (piece of remainingPieces; track piece.id) {
+        <h3>Pièce : {{ piece.id }}</h3>
+        <form class="form-grid compact">
+          <label>Quel est le nom de la pièce ? <input type="text" [value]="piece.nom" disabled /></label>
+          <label>Quelle est la longueur de la pièce ? <input type="text" [value]="piece.longueur" disabled /></label>
+          <label>Quelle est la largeur de la pièce ? <input type="text" [value]="piece.largeur" disabled /></label>
+          <label>Quelle est la hauteur sous-plafond ? <input type="text" [value]="piece.hauteur" disabled /></label>
+          <label
+            >Quelle est la température de confort ? <input type="text" [value]="piece.temperatureConfort" disabled
+          /></label>
+        </form>
 
-      <form class="form-grid compact">
-        <label>Quel est le nom de la pièce ? <input type="text" lettersOnly /></label>
-        <label>Quelle est la longueur de la pièce ? <input type="text" numbersOnly inputmode="numeric" /></label>
-        <label>Quelle est la largeur de la pièce ? <input type="text" numbersOnly inputmode="numeric" /></label>
-        <label>Quelle est la hauteur sous-plafond ? <input type="text" numbersOnly inputmode="numeric" /></label>
-        <label>Quelle est la température de confort ? <input type="text" numbersOnly inputmode="numeric" /></label>
-      </form>
-
-      <div class="result blue">PuissanceP = g x (longueur x largeur x hauteur) x deltaT</div>
+        <div class="result blue">PuissanceP = {{ piece.puissance }}</div>
+      }
 
       <div class="line-actions footer-space">
         <a class="btn prev" routerLink="/rapport">< Rapport</a>
@@ -28,4 +30,10 @@ import { NumbersOnlyDirective } from '../shared/directives/numbers-only.directiv
     </section>
   `,
 })
-export class RapportPageTwoComponent {}
+export class RapportPageTwoComponent {
+  private readonly projectData = inject(ProjectDataService);
+
+  get remainingPieces() {
+    return this.projectData.getPieces().slice(2);
+  }
+}

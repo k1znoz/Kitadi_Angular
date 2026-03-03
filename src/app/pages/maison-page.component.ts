@@ -1,21 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LettersOnlyDirective } from '../shared/directives/letters-only.directive';
 import { NumbersOnlyDirective } from '../shared/directives/numbers-only.directive';
+import { ProjectDataService } from '../shared/services/project-data.service';
 
 @Component({
   selector: 'app-maison-page',
   standalone: true,
-  imports: [RouterLink, LettersOnlyDirective, NumbersOnlyDirective],
+  imports: [FormsModule, RouterLink, LettersOnlyDirective, NumbersOnlyDirective],
   template: `
     <section class="screen">
       <h1 class="title">La maison</h1>
 
       <form class="form-grid">
-        <label>Quelle est l'isolation de la maison ? <input type="text" lettersOnly /></label>
-        <label>Quelle est la température de base ? <input type="text" numbersOnly inputmode="numeric" /></label>
-        <label>Quelle est la hauteur sous-plafond ? <input type="text" numbersOnly inputmode="numeric" /></label>
-        <label>Quel est le nombre de pièces ? <input type="text" numbersOnly inputmode="numeric" /></label>
+        <label
+          >Quelle est l'isolation de la maison ?
+          <input type="text" lettersOnly [(ngModel)]="isolation" name="isolation" (ngModelChange)="saveMaisonData()"
+        /></label>
+        <label
+          >Quelle est la température de base ?
+          <input
+            type="text"
+            numbersOnly
+            inputmode="numeric"
+            [(ngModel)]="temperatureBase"
+            name="temperatureBase"
+            (ngModelChange)="saveMaisonData()"
+        /></label>
+        <label
+          >Quelle est la hauteur sous-plafond ?
+          <input
+            type="text"
+            numbersOnly
+            inputmode="numeric"
+            [(ngModel)]="hauteurSousPlafond"
+            name="hauteurSousPlafond"
+            (ngModelChange)="saveMaisonData()"
+        /></label>
+        <label
+          >Quel est le nombre de pièces ?
+          <input
+            type="text"
+            numbersOnly
+            inputmode="numeric"
+            [(ngModel)]="nombrePieces"
+            name="nombrePieces"
+            (ngModelChange)="saveMaisonData()"
+        /></label>
       </form>
 
       <div class="line-actions">
@@ -28,4 +60,28 @@ import { NumbersOnlyDirective } from '../shared/directives/numbers-only.directiv
     </section>
   `,
 })
-export class MaisonPageComponent {}
+export class MaisonPageComponent {
+  private readonly projectData = inject(ProjectDataService);
+
+  isolation = '';
+  temperatureBase = '';
+  hauteurSousPlafond = '';
+  nombrePieces = '1';
+
+  constructor() {
+    const maison = this.projectData.getMaisonData();
+    this.isolation = maison.isolation;
+    this.temperatureBase = maison.temperatureBase ? String(maison.temperatureBase) : '';
+    this.hauteurSousPlafond = maison.hauteurSousPlafond ? String(maison.hauteurSousPlafond) : '';
+    this.nombrePieces = String(maison.nombrePieces || 1);
+  }
+
+  saveMaisonData(): void {
+    this.projectData.setMaisonData({
+      isolation: this.isolation,
+      temperatureBase: Number(this.temperatureBase) || 0,
+      hauteurSousPlafond: Number(this.hauteurSousPlafond) || 0,
+      nombrePieces: Number(this.nombrePieces) || 1,
+    });
+  }
+}

@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-bdd-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <section class="screen">
       <h1 class="title">Fichier Clients<br />Kitadi Energies</h1>
@@ -17,6 +18,7 @@ import { Component } from '@angular/core';
             <th>Date</th>
             <th>Ville</th>
             <th>Code postal</th>
+            <th>Rapport</th>
           </tr>
         </thead>
         <tbody>
@@ -26,12 +28,15 @@ import { Component } from '@angular/core';
             <td>{{ client.date }}</td>
             <td>{{ client.ville }}</td>
             <td>{{ client.cp }}</td>
+            <td>
+              <a class="table-link" [routerLink]="'/rapport'" [queryParams]="{ ref: client.ref }">Voir ></a>
+            </td>
           </tr>
         </tbody>
       </table>
 
       <div class="new-case-wrap">
-        <button type="button" class="btn clients">Nouveau Dossier</button>
+        <a class="btn clients" routerLink="/client">Nouveau Dossier</a>
       </div>
     </section>
   `,
